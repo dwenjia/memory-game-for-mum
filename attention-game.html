@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>注意力训练 · 掉落物品</title>
+<style>
+:root{--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#777;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#999}}
+:root[data-theme="dark"]{--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#999}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;gap:8px;user-select:none;-webkit-user-select:none}
+.top{display:flex;justify-content:space-between;width:100%;max-width:480px;font-size:18px}
+#stage{position:relative;flex:1;width:100%;max-width:480px;background:var(--card);border-radius:16px;overflow:hidden;min-height:240px}
+.item{position:absolute;left:50%;transform:translateX(-50%);font-size:64px;line-height:1}
+.item.low{filter:drop-shadow(0 0 10px var(--ac))}
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--card);text-align:center;padding:16px}
+#overlay p{color:var(--mut);margin:0;font-size:15px}
+#big{font-size:44px;font-weight:700}
+.row{display:flex;gap:10px;width:100%;max-width:480px}
+.arrow{flex:1;border:0;border-radius:18px;background:var(--card);color:var(--fg);font:inherit;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.arrow .ic{font-size:44px;line-height:1.1}.arrow .ar{font-size:56px;line-height:1;color:var(--ac)}
+.arrow.ok{background:var(--ac)}.arrow.no{background:var(--bad)}
+button.s{font:inherit;border:0;border-radius:12px;padding:12px 28px;background:var(--ac);color:#fff;font-size:18px;cursor:pointer}
+.lv button{font:inherit;border:0;border-radius:10px;padding:6px 14px;background:var(--bg);color:var(--fg);cursor:pointer}
+.lv button.on{background:var(--ac);color:#fff}
+</style></head><body>
+<div class="top"><span>得分：<b id="score">0</b></span><span>第 <b id="cnt">0</b>/10 个</span></div>
+<div id="stage">
+  <div id="overlay">
+    <div id="big">注意力训练</div>
+    <p>物品会从上方慢慢掉落。<br>看最下面的那一个，按对应的箭头。<br>对 +10 分，错 −10 分，共 10 个。</p>
+    <div class="lv" id="lv"></div>
+    <button class="s" id="go">开始</button>
+  </div>
+</div>
+<div class="row">
+  <button class="arrow" id="bL"><span class="ic" id="iL"></span><span class="ar">←</span></button>
+  <button class="arrow" id="bR"><span class="ic" id="iR"></span><span class="ar">→</span></button>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const PAIRS=[['🍎','🐟'],['🐶','🚗'],['🌻','⭐']];
+const LEVELS={'慢':9,'中':7,'快':5}; // seconds to fall
+let runId=0,gap=0,lvl='慢',types,items=[],score,spawned,done,running,last,nextSpawn;
+const TOTAL=10;
+function lvUI(){const d=$('lv');d.innerHTML='';Object.keys(LEVELS).forEach(k=>{const b=document.createElement('button');b.textContent=k;if(k===lvl)b.className='on';b.onclick=()=>{lvl=k;lvUI()};d.appendChild(b)})}
+function start(){
+  const st=$('stage');items.forEach(i=>i.el.remove());
+  types=PAIRS[Math.floor(Math.random()*PAIRS.length)].slice();
+  if(Math.random()<.5)types.reverse();
+  $('iL').textContent=types[0];$('iR').textContent=types[1];
+  items=[];score=0;spawned=0;done=0;const id=++runId;gap=0;running=true;last=performance.now();
+  $('overlay').style.display='none';upd();requestAnimationFrame(t=>loop(t,id));
+}
+function upd(){$('score').textContent=score;$('cnt').textContent=done;}
+function loop(t,id){
+  if(!running||id!==runId)return;
+  const st=$('stage'),H=st.clientHeight,size=64,end=H-size-6,speed=end/LEVELS[lvl];
+  const dt=(t-last)/1000;last=t;
+  if(spawned<TOTAL&&items.length<3&&(!items.length||items[items.length-1].y>=gap)){
+    gap=66+Math.random()*8;
+    const type=Math.random()<.5?0:1;
+    const el=document.createElement('div');el.className='item';el.textContent=types[type];el.style.top='0px';st.appendChild(el);
+    items.push({el,type,y:0});spawned++;
+  }
+  items.forEach(i=>{i.y+=speed*dt;i.el.style.top=i.y+'px'});
+  // items reaching bottom are missed (0 points)
+  while(items.length&&items[0].y>=end){remove(items[0],0)}
+  items.forEach(i=>i.el.classList.remove('low'));
+  if(items.length)items[0].el.classList.add('low');
+  if(running&&id===runId)requestAnimationFrame(t2=>loop(t2,id));
+}
+function remove(it,delta){
+  it.el.remove();items.splice(items.indexOf(it),1);
+  score+=delta;done++;upd();
+  if(done>=TOTAL)finish();
+}
+function press(side){
+  if(!running||!items.length)return;
+  const it=items[0]; // items are ordered by spawn = lowest first
+  const ok=it.type===side;
+  const b=side?$('bR'):$('bL');b.classList.add(ok?'ok':'no');setTimeout(()=>b.classList.remove('ok','no'),250);
+  remove(it,ok?10:-10);
+}
+function finish(){
+  running=false;
+  $('big').textContent=score+' 分';
+  $('overlay').querySelector('p').innerHTML=score>=100?'满分！':'满分 100 分，再试一次？';
+  $('go').textContent='再来一局';$('overlay').style.display='flex';
+}
+$('go').onclick=start;$('bL').onclick=()=>press(0);$('bR').onclick=()=>press(1);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')press(0);if(e.key==='ArrowRight')press(1)});
+lvUI();
+</script></body></html>
