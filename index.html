@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>注意力训练 · 掉落物品</title>
+<title>Attention Training · Falling Items</title>
 <style>
 :root{--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#777;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#999}}
@@ -24,13 +24,13 @@ button.s{font:inherit;border:0;border-radius:12px;padding:12px 28px;background:v
 .lv button{font:inherit;border:0;border-radius:10px;padding:6px 14px;background:var(--bg);color:var(--fg);cursor:pointer}
 .lv button.on{background:var(--ac);color:#fff}
 </style></head><body>
-<div class="top"><span>得分：<b id="score">0</b></span><span>第 <b id="cnt">0</b>/10 个</span></div>
+<div class="top"><span>Score: <b id="score">0</b></span><span>Item <b id="cnt">0</b>/10</span></div>
 <div id="stage">
   <div id="overlay">
-    <div id="big">注意力训练</div>
-    <p>物品会从上方慢慢掉落。<br>看最下面的那一个，按对应的箭头。<br>对 +10 分，错 −10 分，共 10 个。</p>
+    <div id="big">Attention Training</div>
+    <p>Items fall slowly from the top.<br>Look at the lowest one and press the matching arrow.<br>Correct +10, wrong −10. 10 items per round.</p>
     <div class="lv" id="lv"></div>
-    <button class="s" id="go">开始</button>
+    <button class="s" id="go">Start</button>
   </div>
 </div>
 <div class="row">
@@ -39,14 +39,15 @@ button.s{font:inherit;border:0;border-radius:12px;padding:12px 28px;background:v
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const PAIRS=[['🍎','🐟'],['🐶','🚗'],['🌻','⭐']];
-const LEVELS={'慢':9,'中':7,'快':5}; // seconds to fall
-let runId=0,gap=0,lvl='慢',types,items=[],score,spawned,done,running,last,nextSpawn;
+const PAIRS=[['🍎','🐟'],['🐶','🚗'],['🌻','⭐'],['🍌','🐱'],['🚌','🌳'],['🍓','🐸'],['🏠','🎈'],['🦋','🍕'],['🐘','🍇'],['⚽','🌙'],['🐝','🍩'],['🚲','🍄']];
+let lastPair=-1;
+const LEVELS={'Slow':9,'Medium':7,'Fast':5}; // seconds to fall
+let runId=0,gap=0,lvl='Slow',types,items=[],score,spawned,done,running,last,nextSpawn;
 const TOTAL=10;
 function lvUI(){const d=$('lv');d.innerHTML='';Object.keys(LEVELS).forEach(k=>{const b=document.createElement('button');b.textContent=k;if(k===lvl)b.className='on';b.onclick=()=>{lvl=k;lvUI()};d.appendChild(b)})}
 function start(){
   const st=$('stage');items.forEach(i=>i.el.remove());
-  types=PAIRS[Math.floor(Math.random()*PAIRS.length)].slice();
+  let pi;do{pi=Math.floor(Math.random()*PAIRS.length)}while(pi===lastPair);lastPair=pi;types=PAIRS[pi].slice();
   if(Math.random()<.5)types.reverse();
   $('iL').textContent=types[0];$('iR').textContent=types[1];
   items=[];score=0;spawned=0;done=0;const id=++runId;gap=0;running=true;last=performance.now();
@@ -84,9 +85,9 @@ function press(side){
 }
 function finish(){
   running=false;
-  $('big').textContent=score+' 分';
-  $('overlay').querySelector('p').innerHTML=score>=100?'满分！':'满分 100 分，再试一次？';
-  $('go').textContent='再来一局';$('overlay').style.display='flex';
+  $('big').textContent=score+' pts';
+  $('overlay').querySelector('p').innerHTML=score>=100?'Perfect score!':'Max is 100. Try again?';
+  $('go').textContent='Play again';$('overlay').style.display='flex';
 }
 $('go').onclick=start;$('bL').onclick=()=>press(0);$('bR').onclick=()=>press(1);
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')press(0);if(e.key==='ArrowRight')press(1)});
