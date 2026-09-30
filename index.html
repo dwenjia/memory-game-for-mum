@@ -25,7 +25,6 @@ button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 #score.down{color:var(--bad)}
 #stage{position:relative;flex:1;width:100%;max-width:var(--w);background:var(--card);border-radius:16px;overflow:hidden;min-height:240px}
 .item{position:absolute;left:50%;transform:translateX(-50%);font-size:64px;line-height:1;z-index:0}
-.item.low{border-radius:18px;box-shadow:0 0 0 3px var(--card),0 0 0 7px var(--ac)}
 .pop{position:absolute;right:12px;z-index:1;font-size:22px;font-weight:700;line-height:1.2;pointer-events:none;padding:4px 10px;border-radius:10px;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.16);animation:rise 1.1s ease forwards}
 .pop.hit{color:var(--ac)}.pop.bad{color:var(--bad)}.pop.miss{color:var(--mut)}
 @keyframes rise{0%{opacity:1;transform:translateY(0)}40%{opacity:1;transform:translateY(-8px)}100%{opacity:0;transform:translateY(-28px)}}
@@ -118,8 +117,8 @@ const TOTAL=10;
 function say(text){$('live').textContent=text;}
 function helpText(){
   const rule=nItems===4
-    ?'Items fall from the top. The marked one is next: press the arrow that shows it. Each arrow shows two.'
-    :'Items fall from the top. The marked one is next: press the arrow that shows it.';
+    ?'Items fall from the top. Press the arrow that shows the lowest one. Each arrow shows two.'
+    :'Items fall from the top. Press the arrow that shows the lowest one.';
   return rule+' Correct +10, wrong −10, letting one fall scores 0. 10 items per round.';
 }
 function help(){if(!roundOver)$('help').textContent=helpText();}
@@ -175,8 +174,6 @@ function loop(t,id){
   }
   items.forEach(i=>{i.y+=speed*dt;i.el.style.top=i.y+'px'});
   while(running&&items.length&&items[0].y>=end)remove(items[0],0,'miss');
-  items.forEach(i=>i.el.classList.remove('low'));
-  if(items.length)items[0].el.classList.add('low');
   if(running&&id===runId)requestAnimationFrame(t2=>loop(t2,id));
 }
 function popAt(it,kind){
