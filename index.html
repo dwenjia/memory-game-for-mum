@@ -3,29 +3,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Attention Training · Falling Items</title>
 <style>
-:root{--w:480px;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#777;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#999}}
-:root[data-theme="dark"]{--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#999}
+:root{--w:480px;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#5c5c5c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#c8c8c8}}
+:root[data-theme="dark"]{--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#c8c8c8}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;gap:8px;user-select:none;-webkit-user-select:none}
-.top{display:flex;justify-content:space-between;width:100%;max-width:var(--w);font-size:18px}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;width:100%;max-width:var(--w);font-size:18px}
+.hud{display:flex;align-items:center;gap:8px}
+#mode{font-size:15px;color:var(--mut)}
+#pause{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+#pause[hidden],#mode[hidden],#hold[hidden]{display:none}
+.pips{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;order:3}
+.pips[hidden]{display:none}
+.pips i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--mut);background:transparent}
+.pips i.hit{background:var(--ac);box-shadow:none}
+.pips i.bad{background:var(--bad);box-shadow:none;border-radius:2px}
+.pips i.miss{width:12px;height:3px;border-radius:2px;background:var(--mut);box-shadow:none}
+#score.down{color:var(--bad)}
 #stage{position:relative;flex:1;width:100%;max-width:var(--w);background:var(--card);border-radius:16px;overflow:hidden;min-height:240px}
-.item{position:absolute;left:50%;transform:translateX(-50%);font-size:64px;line-height:1}
-.item.low{filter:drop-shadow(0 0 10px var(--ac))}
-#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:14px;background:var(--card);text-align:center;padding:20px 16px;overflow:auto}
-#overlay p{color:var(--mut);margin:0;font-size:15px}
+.item{position:absolute;left:50%;transform:translateX(-50%);font-size:64px;line-height:1;z-index:0}
+.item.low{border-radius:18px;box-shadow:0 0 0 3px var(--card),0 0 0 7px var(--ac)}
+.pop{position:absolute;left:50%;z-index:1;transform:translate(-50%,0);font-size:22px;font-weight:700;pointer-events:none;animation:rise .7s ease forwards}
+.pop.hit{color:var(--ac)}.pop.bad{color:var(--bad)}.pop.miss{color:var(--mut)}
+@keyframes rise{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-36px)}}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}}
+#overlay,#hold{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:14px;text-align:center}
+#overlay{z-index:3;background:var(--card);padding:20px 16px;overflow:auto}
+#hold{z-index:2;background:color-mix(in srgb,var(--card) 84%,transparent)}
+#overlay p,#hold p{color:var(--mut);margin:0;font-size:16px;line-height:1.45;max-width:36ch}
 #big{font-size:44px;font-weight:700}
-.row{display:flex;gap:12px;width:100%;max-width:var(--w)}
-.arrow{flex:1;border:0;border-radius:18px;background:var(--card);color:var(--fg);font:inherit;padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer}
-.arrow .ic{font-size:36px;line-height:1;display:flex;align-items:center;justify-content:center;gap:12px}.arrow .ar{font-size:56px;line-height:1;color:var(--ac)}
+.field{display:flex;flex-direction:column;align-items:center;gap:8px}
+.lbl{font-size:14px;font-weight:650;color:var(--mut)}
+.row{display:flex;gap:16px;width:100%;max-width:var(--w)}
+body:not(.playing) .arrow{visibility:hidden}
+.arrow{flex:1;border:0;border-radius:18px;background:var(--card);color:var(--fg);padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.arrow .ic{font-size:36px;line-height:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
+.arrow .ic span{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:4px;border-radius:12px;background:var(--bg)}
+.arrow .ar{font-size:56px;line-height:1;color:var(--ac)}
 .arrow.ok{background:var(--ac)}.arrow.no{background:var(--bad)}
-button.s{font:inherit;border:0;border-radius:12px;padding:14px 32px;min-height:48px;background:var(--ac);color:#fff;font-size:18px;cursor:pointer}
+.arrow.ok .ar,.arrow.no .ar{color:#fff}
+button.s{border:0;border-radius:12px;padding:14px 32px;min-height:48px;background:var(--ac);color:#fff;font-size:18px}
 .lv{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.lv button{font:inherit;font-size:16px;line-height:1.2;border:0;border-radius:12px;padding:12px 20px;min-height:44px;background:var(--bg);color:var(--fg);cursor:pointer}
+.lv button{border:0;border-radius:12px;padding:12px 20px;min-height:44px;background:var(--bg);color:var(--fg);font-size:16px;line-height:1.2}
 .lv button.on{background:var(--ac);color:#fff}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 @media (min-width:700px){:root{--w:640px}}
 body{height:100dvh}
+@media (max-width:360px){
+ .arrow{padding:16px 12px}
+ .arrow .ic{font-size:32px;gap:8px}
+ .arrow .ic span{min-width:40px;min-height:40px}
+}
 @media (orientation:landscape) and (max-height:520px){
  body{display:grid;grid-template-columns:1fr minmax(0,var(--w)) 1fr;grid-template-rows:auto 1fr;gap:8px 10px;align-items:stretch;justify-items:center}
  .top{grid-column:2;grid-row:1}
@@ -36,44 +67,97 @@ body{height:100dvh}
  .row{display:contents}
  #bL{grid-column:1;grid-row:1/3;width:100%;justify-content:center}
  #bR{grid-column:3;grid-row:1/3;width:100%;justify-content:center}
+ .arrow{padding:12px 10px;gap:8px}
+ .arrow .ar{font-size:40px}
+ .arrow .ic{font-size:28px;gap:8px}
 }
 </style></head><body>
-<div class="top"><span>Score: <b id="score">0</b></span><span>Item <b id="cnt">0</b>/10</span></div>
+<div class="top">
+  <span>Score: <b id="score">0</b></span>
+  <div class="pips" id="pips" hidden role="img" aria-label="0 of 10 answered"></div>
+  <div class="hud">
+    <span id="mode" hidden></span>
+    <button type="button" id="pause" hidden aria-pressed="false">Pause</button>
+  </div>
+</div>
 <div id="stage">
+  <div id="hold" hidden>
+    <p>Paused</p>
+    <button type="button" class="s" id="resume">Resume</button>
+  </div>
   <div id="overlay">
     <div id="big">Attention Training</div>
-    <p>Items fall slowly from the top.<br>Look at the lowest one and press the arrow that shows it (with 4 items, each arrow shows two).<br>Correct +10, wrong −10. 10 items per round.</p>
-    <div class="lv" id="nsel"></div>
-    <div class="lv" id="lv"></div>
-    <button class="s" id="go">Start</button>
+    <p id="help"></p>
+    <div class="field"><span class="lbl" id="itemsLbl">Items</span><div class="lv" id="nsel" role="group" aria-labelledby="itemsLbl"></div></div>
+    <div class="field"><span class="lbl" id="speedLbl">Speed</span><div class="lv" id="lv" role="group" aria-labelledby="speedLbl"></div></div>
+    <button type="button" class="s" id="go">Start</button>
   </div>
 </div>
 <div class="row">
-  <button class="arrow" id="bL"><span class="ic" id="iL"></span><span class="ar">←</span></button>
-  <button class="arrow" id="bR"><span class="ic" id="iR"></span><span class="ar">→</span></button>
+  <button type="button" class="arrow" id="bL" aria-label="Left"><span class="ic" id="iL"></span><span class="ar" aria-hidden="true">←</span></button>
+  <button type="button" class="arrow" id="bR" aria-label="Right"><span class="ic" id="iR"></span><span class="ar" aria-hidden="true">→</span></button>
 </div>
+<div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
 <script>
 const $=id=>document.getElementById(id);
 const PAIRS=[['🍎','🍌','🐶','🐱'],['🚗','🚌','🌻','🌳'],['🍓','🍇','🐸','🐘'],['🍕','🍩','🚲','🚂'],['⭐','🌙','🍄','🌷'],['🦋','🐝','🍒','🥕']];
 let lastPair=-1;
 const LEVELS={'Slow':12.9,'Medium':10,'Fast':7.1}; // seconds to fall
-let nItems=4,runId=0,gap=0,lvl='Slow',types,items=[],score,spawned,done,running,last,nextSpawn;
+const calm=matchMedia('(prefers-reduced-motion: reduce)');
+let nItems=2,runId=0,gap=0,lvl='Slow',types,items=[],score,spawned,done,running,paused,last;
+let hits,wrongs,misses,pipState,roundOver=false;
 const TOTAL=10;
-function nUI(){const d=$('nsel');d.innerHTML='';[2,4].forEach(k=>{const b=document.createElement('button');b.textContent=k+' items';if(k===nItems)b.className='on';b.onclick=()=>{nItems=k;nUI()};d.appendChild(b)})}
-function lvUI(){const d=$('lv');d.innerHTML='';Object.keys(LEVELS).forEach(k=>{const b=document.createElement('button');b.textContent=k;if(k===lvl)b.className='on';b.onclick=()=>{lvl=k;lvUI()};d.appendChild(b)})}
-function start(){
-  const st=$('stage');items.forEach(i=>i.el.remove());
-  let pi;do{pi=Math.floor(Math.random()*PAIRS.length)}while(pi===lastPair);lastPair=pi;const g=PAIRS[pi];types=nItems===4?g.slice():[g[Math.random()<.5?0:1],g[Math.random()<.5?2:3]];
-  if(Math.random()<.5)types.reverse();
-  const icons=(el,glyphs)=>{el.replaceChildren(...glyphs.map(ch=>{const s=document.createElement('span');s.textContent=ch;return s}))};
-  if(nItems===4){icons($('iL'),types.slice(0,2));icons($('iR'),types.slice(2));}else{icons($('iL'),[types[0]]);icons($('iR'),[types[1]]);}
-  items=[];score=0;spawned=0;done=0;const id=++runId;gap=0;running=true;last=performance.now();
-  $('overlay').style.display='none';upd();requestAnimationFrame(t=>loop(t,id));
+function say(text){$('live').textContent=text;}
+function helpText(){
+  const rule=nItems===4
+    ?'Items fall from the top. The marked one is next: press the arrow that shows it. Each arrow shows two.'
+    :'Items fall from the top. The marked one is next: press the arrow that shows it.';
+  return rule+' Correct +10, wrong −10, letting one fall scores 0. 10 items per round.';
 }
-function upd(){$('score').textContent=score;$('cnt').textContent=done;}
+function help(){if(!roundOver)$('help').textContent=helpText();}
+function choice(label,on){
+  const b=document.createElement('button');
+  b.type='button';b.textContent=label;b.setAttribute('aria-pressed',on?'true':'false');
+  if(on)b.className='on';
+  return b;
+}
+function nUI(){const d=$('nsel');d.replaceChildren();[2,4].forEach(k=>{const b=choice(k+' items',k===nItems);b.onclick=()=>{nItems=k;nUI();help()};d.appendChild(b)})}
+function lvUI(){const d=$('lv');d.replaceChildren();Object.keys(LEVELS).forEach(k=>{const b=choice(k,k===lvl);b.onclick=()=>{lvl=k;lvUI()};d.appendChild(b)})}
+function glyphsFor(side){return nItems===4?types.slice(side*2,side*2+2):[types[side]];}
+function paintSide(side){
+  const glyphs=glyphsFor(side);
+  const el=side?$('iR'):$('iL');
+  el.replaceChildren(...glyphs.map(ch=>{const s=document.createElement('span');s.textContent=ch;return s}));
+  (side?$('bR'):$('bL')).setAttribute('aria-label',(side?'Right':'Left')+', '+glyphs.join(', '));
+}
+function fallTime(){return LEVELS[lvl]*(calm.matches?1.6:1);}
+function pipUI(){
+  const d=$('pips');d.replaceChildren();
+  for(let i=0;i<TOTAL;i++){const s=document.createElement('i');s.className=pipState[i]||'pending';d.appendChild(s)}
+  d.setAttribute('aria-label',done+' of '+TOTAL+' answered');
+}
+function upd(){$('score').textContent=score;pipUI();}
+function start(){
+  const st=$('stage');
+  items.forEach(i=>i.el.remove());
+  st.querySelectorAll('.pop').forEach(el=>el.remove());
+  let pi;do{pi=Math.floor(Math.random()*PAIRS.length)}while(pi===lastPair);lastPair=pi;const g=PAIRS[pi];
+  types=nItems===4?g.slice():[g[Math.random()<.5?0:1],g[Math.random()<.5?2:3]];
+  if(Math.random()<.5)types.reverse();
+  paintSide(0);paintSide(1);
+  items=[];score=0;spawned=0;done=0;hits=0;wrongs=0;misses=0;pipState=[];
+  paused=false;roundOver=false;const id=++runId;gap=0;running=true;last=performance.now();
+  $('score').classList.remove('down');
+  $('hold').hidden=true;$('pause').hidden=false;$('pause').textContent='Pause';$('pause').setAttribute('aria-pressed','false');
+  $('mode').hidden=false;$('mode').textContent=nItems+' · '+lvl;$('pips').hidden=false;
+  document.body.classList.add('playing');
+  $('overlay').style.display='none';upd();
+  requestAnimationFrame(t=>loop(t,id));
+}
 function loop(t,id){
   if(!running||id!==runId)return;
-  const st=$('stage'),H=st.clientHeight,size=Math.max(56,Math.min(110,st.clientWidth/6.5)),end=H-size-6,speed=end/LEVELS[lvl];
+  if(paused){last=t;requestAnimationFrame(t2=>loop(t2,id));return}
+  const st=$('stage'),H=st.clientHeight,size=Math.max(56,Math.min(110,st.clientWidth/6.5)),end=H-size-6,speed=end/fallTime();
   const dt=(t-last)/1000;last=t;
   if(spawned<TOTAL&&items.length<3&&(!items.length||items[items.length-1].y>=gap)){
     gap=(110+Math.random()*40)*size/64;
@@ -82,31 +166,69 @@ function loop(t,id){
     items.push({el,type,y:0});spawned++;
   }
   items.forEach(i=>{i.y+=speed*dt;i.el.style.top=i.y+'px'});
-  // items reaching bottom are missed (0 points)
-  while(items.length&&items[0].y>=end){remove(items[0],0)}
+  while(running&&items.length&&items[0].y>=end)remove(items[0],0,'miss');
   items.forEach(i=>i.el.classList.remove('low'));
   if(items.length)items[0].el.classList.add('low');
   if(running&&id===runId)requestAnimationFrame(t2=>loop(t2,id));
 }
-function remove(it,delta){
-  it.el.remove();items.splice(items.indexOf(it),1);
-  score+=delta;done++;upd();
+function popAt(it,kind){
+  const el=document.createElement('div');
+  el.className='pop '+kind;
+  el.textContent=kind==='hit'?'+10':kind==='bad'?'−10':'Miss';
+  el.style.top=it.y+'px';
+  $('stage').appendChild(el);
+  setTimeout(()=>el.remove(),calm.matches?900:700);
+}
+function remove(it,delta,kind){
+  popAt(it,kind);
+  it.el.remove();
+  const i=items.indexOf(it);if(i>=0)items.splice(i,1);
+  if(kind==='hit')hits++;else if(kind==='bad')wrongs++;else misses++;
+  pipState[done]=kind;
+  score+=delta;done++;
+  if(delta<0||score<0)$('score').classList.add('down');
+  else if(delta>0&&score>=0)$('score').classList.remove('down');
+  upd();
   if(done>=TOTAL)finish();
+  else say((kind==='hit'?'Correct. Plus 10. ':kind==='bad'?'Wrong. Minus 10. ':'Missed. ')+done+' of '+TOTAL+'. Score '+score+'.');
+}
+function flash(b,ok){
+  b.classList.remove('ok','no');b.classList.add(ok?'ok':'no');
+  clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('ok','no'),400);
 }
 function press(side){
-  if(!running||!items.length)return;
-  const it=items[0]; // items are ordered by spawn = lowest first
+  if(!running||paused||!items.length)return;
+  const it=items[0];
   const ok=(nItems===4?Math.floor(it.type/2):it.type)===side;
-  const b=side?$('bR'):$('bL');b.classList.add(ok?'ok':'no');setTimeout(()=>b.classList.remove('ok','no'),250);
-  remove(it,ok?10:-10);
+  flash(side?$('bR'):$('bL'),ok);
+  remove(it,ok?10:-10,ok?'hit':'bad');
+}
+function setPause(on){
+  if(!running)return;
+  paused=on;
+  $('hold').hidden=!on;
+  $('pause').textContent=on?'Resume':'Pause';
+  $('pause').setAttribute('aria-pressed',on?'true':'false');
+  say(on?'Paused':'Resumed');
+  if(!on)last=performance.now();
 }
 function finish(){
-  running=false;
+  running=false;paused=false;roundOver=true;
+  document.body.classList.remove('playing');
+  $('hold').hidden=true;$('pause').hidden=true;
   $('big').textContent=score+' pts';
-  $('overlay').querySelector('p').innerHTML=score>=100?'Perfect score!':'Max is 100. Try again?';
-  $('go').textContent='Play again';$('overlay').style.display='flex';
+  $('help').textContent=hits+' correct, '+wrongs+' wrong, '+misses+' missed';
+  $('go').textContent='Play again';
+  $('overlay').style.display='flex';
+  say('Round over. '+$('help').textContent+'. Score '+score+'.');
 }
-$('go').onclick=start;$('bL').onclick=()=>press(0);$('bR').onclick=()=>press(1);
-document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')press(0);if(e.key==='ArrowRight')press(1)});
-nUI();lvUI();
+$('go').onclick=start;
+$('pause').onclick=()=>setPause(!paused);
+$('resume').onclick=()=>setPause(false);
+$('bL').onclick=()=>press(0);$('bR').onclick=()=>press(1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();press(e.key==='ArrowRight'?1:0)}
+  else if(e.key==='Escape'&&running)setPause(!paused);
+});
+nUI();lvUI();help();
 </script></body></html>
