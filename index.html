@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Attention Training · Falling Items</title>
+<title>Training</title>
 <style>
 :root{--w:480px;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#5c5c5c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#c8c8c8}}
@@ -36,7 +36,7 @@ button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 #hold{z-index:2;background:color-mix(in srgb,var(--card) 72%,transparent)}
 #hold .panel{background:var(--card);border-radius:16px;padding:20px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.16)}
 #overlay p,#hold p{color:var(--mut);margin:0;font-size:16px;line-height:1.45;max-width:36ch}
-#big{font-size:44px;font-weight:700}
+#big{font-size:44px;font-weight:700;line-height:1.1}
 .field{display:flex;flex-direction:column;align-items:center;gap:8px}
 .lbl{font-size:14px;font-weight:650;color:var(--mut)}
 .row{display:flex;gap:16px;width:100%;max-width:var(--w)}
@@ -53,20 +53,100 @@ button.s{border:0;border-radius:12px;padding:14px 32px;min-height:48px;backgroun
 .lv button.on{background:var(--ac);color:#fff}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 @media (min-width:700px){:root{--w:640px}}
-body{height:100dvh}
-@media (max-width:360px){
- .arrow{padding:16px 12px}
- .arrow .ic{font-size:32px;gap:8px}
- .arrow .ic span{min-width:40px;min-height:40px}
+body{height:100dvh;max-height:100dvh;overflow:hidden}
+#stage{min-height:min(240px,34dvh)}
+@media (max-width:420px){
+ .top{font-size:16px}
+ .row{gap:10px}
+ .arrow{padding:14px 10px;gap:10px}
+ .arrow .ic{font-size:30px;gap:6px}
+ .arrow .ic span{min-width:40px;min-height:40px;padding:2px}
+ .arrow .ar{font-size:44px}
+}
+#picker{width:100%;max-width:var(--w);flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;text-align:center;padding:12px 0 24px}
+#picker h1{font-size:40px;line-height:1.1;margin:0}
+#picker .lead{margin:0 0 8px;color:var(--mut);font-size:16px}
+.pick{width:100%;border:1px solid color-mix(in srgb,var(--fg) 14%,transparent);border-radius:16px;background:var(--card);color:var(--fg);text-align:left;padding:18px 20px;min-height:88px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;box-shadow:0 8px 22px rgba(0,0,0,.06)}
+.pick-name{font-size:20px;font-weight:700}
+.pick-desc{font-size:15px;line-height:1.4;color:var(--mut)}
+#games{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+#fall{display:contents}
+body:not(.fall) #fall,body:not(.pick) #picker,body:not(.mem) #mem{display:none}
+#mem{width:min(100%,480px);flex:1;min-height:0;max-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:8px;padding:4px 0 8px;overflow:auto;--cell:#3a3f4b;--lit:#ffc83d;--ok:#2ecc71;--bad:#e74c3c;--btn:#2f6fed}
+#mem-side{display:contents}
+@media (prefers-color-scheme:dark){#mem{--cell:#2b2f38}}
+:root[data-theme="dark"] #mem{--cell:#2b2f38}
+#mem h1{font-size:22px;margin:0;order:1}
+#mem .bar{display:flex;gap:10px 16px;font-size:17px;margin:0;flex-wrap:wrap;justify-content:center;align-items:center;width:100%;order:1}
+#mem-msg{min-height:28px;font-size:22px;font-weight:700;margin:0;text-align:center;order:1}
+#mem-board{order:2;flex:1 1 auto;min-height:0;max-height:420px;width:min(100%,420px);display:grid;place-items:center;container-type:size}
+#mem-grid{display:grid;gap:clamp(6px,2.4cqmin,12px);width:min(100cqw,100cqh,420px);height:min(100cqw,100cqh,420px)}
+#mem-grid.big{gap:clamp(4px,1.6cqmin,9px)}
+#mem .c{background:var(--cell);border:0;border-radius:clamp(8px,16%,14px);transition:background .15s;cursor:pointer}
+#mem .c.lit{background:var(--lit)}#mem .c.ok{background:var(--ok)}#mem .c.bad{background:var(--bad)}
+#mem .c:focus-visible{outline:3px solid var(--lit);outline-offset:3px}
+#mem-timer{width:48px;height:48px;border-radius:50%;background:var(--lit);color:#1b1e24;font-size:26px;font-weight:700;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);flex:none}
+#mem-trophy{display:none;font-size:72px;line-height:1;margin:0;order:3;animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+#mem-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:none;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+#mem-overlay.show{display:flex;animation:fadein .4s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+#mem-bigtrophy{font-size:min(70vw,60vh,380px);line-height:1;animation:bigpop 1s ease-out,float 2s ease-in-out 1s infinite;filter:drop-shadow(0 0 40px #ffc83d)}
+@keyframes bigpop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.3) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.05)}}
+#mem-ovtext{color:#fff;font-size:28px;font-weight:700;margin-top:16px;text-align:center}
+#mem-ovsub{color:#ddd;font-size:15px;margin-top:6px}
+#mem .conf{position:absolute;top:-40px;font-size:28px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+#mem-final{font-size:clamp(16px,4vw,24px);font-weight:700;margin:0;text-align:center;order:3}
+#mem-final:empty{display:none}
+#mem .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:0;order:3}
+#mem button.go{background:var(--btn);color:#fff;border:0;border-radius:12px;font-size:20px;padding:12px 30px;min-height:48px}
+#mem button.go.alt{background:var(--cell)}
+#mem-games{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+@media (prefers-reduced-motion:reduce){
+ #mem-trophy,#mem-bigtrophy,#mem .conf,#mem-overlay{animation:none}
+ #mem .c{transition:none}
+}
+body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
+@media (max-height:420px){
+ body{padding:6px;gap:6px}
+ #picker{padding:0;gap:8px}
+ #picker h1{font-size:28px}
+ #picker .lead{font-size:14px;margin:0}
+ .pick{padding:10px 14px;min-height:0;gap:2px}
+}
+@media (orientation:landscape) and (max-height:560px){
+ body.mem #mem{width:100%;max-width:none;display:grid;grid-template-columns:minmax(148px,34%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;gap:8px 12px;padding:0}
+ body.mem #mem-side{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:8px;min-width:0;min-height:0;overflow:auto;grid-column:1;grid-row:1}
+ body.mem #mem .bar,body.mem #mem h1,body.mem #mem-msg,body.mem #mem-trophy,body.mem #mem-final,body.mem #mem .btns{order:0;width:auto;max-width:100%;justify-content:flex-start;text-align:left}
+ body.mem #mem h1{font-size:18px}
+ body.mem #mem .bar{font-size:14px;gap:6px 10px}
+ body.mem #mem-msg{font-size:16px;min-height:0}
+ body.mem #mem-trophy{font-size:40px}
+ body.mem #mem-final{font-size:15px}
+ body.mem #mem-board{grid-column:2;grid-row:1;width:100%;height:100%;max-width:none;max-height:none;order:0}
+}
+@media (max-height:680px){
+ #big{font-size:clamp(24px,6.5vw,32px)}
+ #overlay .sheet{gap:8px;padding:10px 12px 4px}
+ #overlay p{font-size:14px;line-height:1.35}
+ .field{gap:4px}
+ .lv{gap:8px}
+ .lv button{min-height:40px;padding:8px 14px}
+ #overlay #go{margin:6px 12px 10px}
 }
 @media (orientation:landscape) and (max-height:520px){
- body{display:grid;grid-template-columns:1fr minmax(0,var(--w)) 1fr;grid-template-rows:auto 1fr;gap:8px 10px;align-items:stretch;justify-items:center}
+ body.fall{display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,var(--w)) minmax(72px,1fr);grid-template-rows:auto 1fr;gap:8px 10px;align-items:stretch;justify-items:center}
  .top{grid-column:2;grid-row:1}
  #stage{grid-column:2;grid-row:2;min-height:0}
- #overlay .sheet{gap:6px;padding:8px}
- #big{font-size:28px}
- #overlay p{font-size:13px}
- #overlay #go{margin:6px 8px}
+ #overlay .sheet{display:grid;grid-template-columns:1fr 1fr;justify-items:center;align-content:safe center;gap:4px 10px;padding:6px 8px 2px}
+ #big,#help{grid-column:1 / -1}
+ #big{font-size:22px}
+ #overlay p{font-size:13px;line-height:1.3;max-width:64ch}
+ .lv{gap:6px}
+ .lv button{min-height:36px;padding:6px 8px;font-size:14px}
+ #overlay #go{margin:4px 8px 8px;min-height:40px;padding:8px 22px}
  .row{display:contents}
  #bL{grid-column:1;grid-row:1/3;width:100%;justify-content:center}
  #bR{grid-column:3;grid-row:1/3;width:100%;justify-content:center}
@@ -74,11 +154,25 @@ body{height:100dvh}
  .arrow .ar{font-size:40px}
  .arrow .ic{font-size:28px;gap:8px}
 }
-</style></head><body>
+</style></head><body class="pick">
+<section id="picker">
+  <h1>Training</h1>
+  <p class="lead">Choose a game</p>
+  <button type="button" class="pick" id="pickFall">
+    <span class="pick-name">Falling Items</span>
+    <span class="pick-desc">Press the arrow that shows the lowest item.</span>
+  </button>
+  <button type="button" class="pick" id="pickMem">
+    <span class="pick-name">Memory</span>
+    <span class="pick-desc">Remember the lit squares, then tap them.</span>
+  </button>
+</section>
+<div id="fall">
 <div class="top">
   <span>Score: <b id="score">0</b></span>
   <div class="pips" id="pips" hidden role="img" aria-label="0 of 10 answered"></div>
   <div class="hud">
+    <button type="button" id="games">Games</button>
     <span id="mode" hidden></span>
     <button type="button" id="pause" hidden aria-pressed="false">Pause</button>
   </div>
@@ -105,6 +199,34 @@ body{height:100dvh}
   <button type="button" class="arrow" id="bR" aria-label="Right"><span class="ic" id="iR"></span><span class="ar" aria-hidden="true">→</span></button>
 </div>
 <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
+</div>
+<div id="mem">
+  <div id="mem-side">
+    <div class="bar">
+      <button type="button" id="mem-games">Games</button>
+      <span id="mem-level">Level 1</span>
+      <span id="mem-round">Round 0/4</span>
+      <span id="mem-score">Score: 0</span>
+      <div id="mem-timer"></div>
+    </div>
+    <h1>Memory Training</h1>
+    <div id="mem-msg" aria-live="polite">Click Start</div>
+    <div id="mem-trophy" aria-hidden="true">🏆</div>
+    <div id="mem-final"></div>
+    <div class="btns">
+      <button type="button" class="go" id="mem-next" hidden>Next Level ▶</button>
+      <button type="button" class="go" id="mem-start">Start</button>
+    </div>
+  </div>
+  <div id="mem-board">
+    <div id="mem-grid"></div>
+  </div>
+  <div id="mem-overlay">
+    <div id="mem-bigtrophy" aria-hidden="true">🏆</div>
+    <div id="mem-ovtext">Congratulations!</div>
+    <div id="mem-ovsub">Tap to continue</div>
+  </div>
+</div>
 <script>
 const $=id=>document.getElementById(id);
 const PAIRS=[['🍎','🍌','🐶','🐱'],['🚗','🚌','🌻','🌳'],['🍓','🍇','🐸','🐘'],['🍕','🍩','🚲','🚂'],['⭐','🌙','🍄','🌷'],['🦋','🐝','🍒','🥕']];
@@ -232,8 +354,165 @@ $('pause').onclick=()=>setPause(!paused);
 $('resume').onclick=()=>setPause(false);
 $('bL').onclick=()=>press(0);$('bR').onclick=()=>press(1);
 document.addEventListener('keydown',e=>{
+  if(!document.body.classList.contains('fall'))return;
   if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();press(e.key==='ArrowRight'?1:0)}
   else if(e.key==='Escape'&&running)setPause(!paused);
 });
+let stopMem=()=>{},enterMem=()=>{};
+function leaveFall(){
+  runId++;running=false;paused=false;
+  document.body.classList.remove('playing');
+  $('hold').hidden=true;$('pause').hidden=true;
+  if($('overlay').style.display==='none'){
+    $('big').textContent='Attention Training';
+    $('go').textContent='Start';
+    roundOver=false;help();
+    $('overlay').style.display='flex';
+    $('mode').hidden=true;$('pips').hidden=true;
+    $('score').textContent='0';$('score').classList.remove('down');
+  }
+}
+function showPick(){
+  stopMem();leaveFall();
+  document.body.classList.remove('fall','mem','playing');
+  document.body.classList.add('pick');
+  document.title='Training';
+}
+function showFall(){
+  stopMem();
+  document.body.classList.remove('pick','mem');
+  document.body.classList.add('fall');
+  document.title='Attention Training · Falling Items';
+}
+function showMem(){
+  leaveFall();
+  document.body.classList.remove('pick','fall','playing');
+  document.body.classList.add('mem');
+  document.title='Memory Training';
+  enterMem();
+}
+$('games').onclick=showPick;
+$('pickFall').onclick=showFall;
+$('pickMem').onclick=showMem;
 nUI();lvUI();help();
+(()=>{
+const SHOW_MS=3000,NEXT_MS=2000;
+const LEVELS=[{n:3,k:2,rounds:4},{n:4,k:4,rounds:5}];
+const total=()=>LEVELS[level].rounds;
+const grid=$('mem-grid'),msg=$('mem-msg');
+const startBtn=$('mem-start'),nextBtn=$('mem-next');
+let level=0,round=0,score=0,targets=[],found=[],canTap=false,cells=[];
+let tick,waitShow,waitAfter,advTimer,ovTimer;
+function buildGrid(){
+  const n=LEVELS[level].n;
+  grid.replaceChildren();cells=[];
+  grid.style.gridTemplateColumns='repeat('+n+',1fr)';
+  grid.className=n>3?'big':'';
+  for(let i=0;i<n*n;i++){
+    const b=document.createElement('button');
+    b.type='button';b.className='c';b.setAttribute('aria-label','Square '+(i+1));
+    b.onclick=()=>tap(i);grid.appendChild(b);cells.push(b);
+  }
+}
+function reset(){cells.forEach(c=>c.className='c');}
+function setInfo(){
+  $('mem-level').textContent='Level '+(level+1);
+  $('mem-round').textContent='Round '+round+'/'+total();
+  $('mem-score').textContent='Score: '+score;
+}
+function closeOverlay(){$('mem-overlay').classList.remove('show');clearTimeout(ovTimer);}
+stopMem=function(){
+  clearInterval(tick);clearTimeout(waitShow);clearTimeout(waitAfter);clearTimeout(advTimer);clearTimeout(ovTimer);
+  canTap=false;$('mem-timer').style.display='none';closeOverlay();
+};
+function startLevel(){
+  round=0;score=0;buildGrid();
+  $('mem-final').textContent='';
+  $('mem-trophy').style.display='none';
+  newRound();
+}
+function newRound(){
+  round++;setInfo();reset();found=[];canTap=false;
+  const {n,k}=LEVELS[level];
+  const idx=[...Array(n*n).keys()].sort(()=>Math.random()-.5);
+  targets=idx.slice(0,k);
+  msg.textContent='Remember the lit squares…';
+  clearTimeout(waitShow);
+  waitShow=setTimeout(()=>{
+    targets.forEach(i=>cells[i].classList.add('lit'));
+    const timer=$('mem-timer');
+    let left=Math.round(SHOW_MS/1000);
+    timer.textContent=left;timer.style.display='flex';
+    clearInterval(tick);
+    tick=setInterval(()=>{
+      left--;
+      if(left>0){timer.textContent=left;return;}
+      clearInterval(tick);timer.style.display='none';
+      reset();msg.textContent='Tap the squares that were lit';canTap=true;
+    },1000);
+  },500);
+}
+function tap(i){
+  if(!canTap||found.includes(i))return;
+  if(targets.includes(i)){
+    found.push(i);cells[i].classList.add('ok');
+    if(found.length===targets.length){canTap=false;score+=10;setInfo();msg.textContent='✅ Correct! +10';after();}
+  }else{
+    canTap=false;cells[i].classList.add('bad');
+    targets.forEach(t=>cells[t].classList.add('ok'));
+    msg.textContent='❌ Wrong';after();
+  }
+}
+function after(){
+  clearTimeout(waitAfter);
+  if(round>=total())waitAfter=setTimeout(finish,NEXT_MS);
+  else waitAfter=setTimeout(newRound,NEXT_MS);
+}
+function finish(){
+  reset();
+  const perfect=score===total()*10,hasNext=level<LEVELS.length-1;
+  msg.textContent=perfect?'🎉 Perfect score!':'Game over';
+  let t='Final score: '+score+' / '+(total()*10);
+  if(perfect&&!hasNext){t+='\nAll levels complete!';$('mem-trophy').style.display='block';celebrate();}
+  const f=$('mem-final');
+  f.style.whiteSpace='pre-line';f.textContent=t;
+  startBtn.textContent='Play Again';startBtn.classList.toggle('alt',perfect&&hasNext);startBtn.hidden=false;
+  nextBtn.hidden=!(perfect&&hasNext);
+  clearTimeout(advTimer);
+  if(perfect&&hasNext){
+    msg.textContent='🎉 Level '+(level+1)+' complete!';
+    f.textContent+='\nStarting Level '+(level+2)+' in 4 seconds…';
+    advTimer=setTimeout(goNext,4000);
+  }
+}
+function goNext(){clearTimeout(advTimer);level++;startBtn.hidden=true;nextBtn.hidden=true;startLevel();}
+function celebrate(){
+  const ov=$('mem-overlay');
+  ov.querySelectorAll('.conf').forEach(e=>e.remove());
+  const em=['🎉','✨','⭐','🎊'];
+  for(let i=0;i<36;i++){
+    const c=document.createElement('span');c.className='conf';c.textContent=em[i%em.length];c.setAttribute('aria-hidden','true');
+    c.style.left=Math.random()*100+'%';
+    c.style.animationDuration=(2.5+Math.random()*2.5)+'s';
+    c.style.animationDelay=(Math.random()*2)+'s';
+    ov.appendChild(c);
+  }
+  ov.classList.add('show');
+  clearTimeout(ovTimer);ovTimer=setTimeout(closeOverlay,6000);
+}
+enterMem=function(){
+  stopMem();
+  level=0;round=0;score=0;
+  $('mem-final').textContent='';
+  $('mem-trophy').style.display='none';
+  startBtn.hidden=false;startBtn.textContent='Start';startBtn.classList.remove('alt');
+  nextBtn.hidden=true;
+  msg.textContent='Click Start';
+  buildGrid();setInfo();
+};
+$('mem-overlay').onclick=closeOverlay;
+startBtn.onclick=()=>{clearTimeout(advTimer);startBtn.hidden=true;nextBtn.hidden=true;startLevel();};
+nextBtn.onclick=goNext;
+$('mem-games').onclick=showPick;
+})();
 </script></body></html>
