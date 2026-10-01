@@ -880,7 +880,7 @@ async function roundWon(){
   setMsg(msg,'');
   announce(msg);
   chimeUp();
-  if(!await wait(1100)||my!==playToken)return;
+  if(!await wait(1600)||my!==playToken)return;
   sequence.push(randomId());
   playSequence();
 }
@@ -894,7 +894,7 @@ async function roundLost(){
   announce(msg+' The same colours will play again.');
   calmTone();
   updateControls();
-  if(!await wait(1400)||my!==playToken)return;
+  if(!await wait(1800)||my!==playToken)return;
   playSequence();
 }
 function onTap(id){
