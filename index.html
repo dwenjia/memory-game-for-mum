@@ -1,56 +1,95 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Training</title>
+<title>Games</title>
 <style>
-:root{--w:480px;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);--bg:#f6f5f1;--fg:#222;--card:#fff;--ac:#2f7d6d;--bad:#d64545;--mut:#5c5c5c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#c8c8c8}}
-:root[data-theme="dark"]{--bg:#181a19;--fg:#eee;--card:#262a28;--ac:#5cc2ad;--bad:#ef6b6b;--mut:#c8c8c8}
+:root{
+  --w:480px;
+  --color-bg:#fff9f2;
+  --color-bg-secondary:#f5f1ea;
+  --color-surface:#fff;
+  --color-text:#292929;
+  --color-text-muted:#706d68;
+  --color-primary:#ff6b57;
+  --color-primary-press:#f05a46;
+  --color-secondary:#f7d774;
+  --color-accent:#a8c9a0;
+  --radius-sm:12px;
+  --radius-md:18px;
+  --radius-lg:28px;
+  --radius-pill:999px;
+  --space-sm:8px;
+  --space-md:16px;
+  --space-lg:24px;
+  --space-xl:40px;
+  --shadow:0 10px 28px rgba(41,41,41,.06);
+  --bg:var(--color-bg);
+  --fg:var(--color-text);
+  --card:var(--color-surface);
+  --card2:var(--color-surface);
+  --fill:var(--color-bg-secondary);
+  --seg:var(--color-bg-secondary);
+  --on:var(--color-surface);
+  --sep:#e6e0d8;
+  --blue:var(--color-primary);
+  --ac:#7daa78;
+  --bad:#e07a6a;
+  --mut:var(--color-text-muted);
+  --ink:var(--color-text);
+  color-scheme:light
+}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;gap:8px;user-select:none;-webkit-user-select:none}
-button{font:inherit;cursor:pointer}
-button:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
-.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;width:100%;max-width:var(--w);font-size:18px}
+body{background:var(--color-bg);color:var(--color-text);font-family:ui-rounded,"SF Pro Rounded","Avenir Next","Nunito","PingFang SC","Noto Sans SC",sans-serif;display:flex;flex-direction:column;align-items:center;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:12px;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:antialiased;line-height:1.45}
+button{font:inherit;cursor:pointer;transition:transform .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease}
+button:active{transform:scale(.98)}
+button:focus-visible{outline:3px solid var(--color-primary);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){button{transition:none}}
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;width:100%;max-width:var(--w);margin-inline:auto;font-size:17px}
+.scoreblock{display:flex;flex-direction:column;line-height:1.05;min-width:64px}
+.scorecap{font-size:12px;font-weight:600;color:var(--mut)}
+#score{font-size:22px;font-weight:700;letter-spacing:-.3px}
 .hud{display:flex;align-items:center;gap:8px}
 #mode{font-size:15px;color:var(--mut)}
-#pause{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+#pause{border:0;border-radius:var(--radius-pill);padding:8px 16px;min-height:40px;background:var(--color-bg-secondary);color:var(--color-text);font-weight:700;font-size:15px}
 #pause[hidden],#mode[hidden],#hold[hidden]{display:none}
 .pips{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;order:3}
 .pips[hidden]{display:none}
-.pips i{width:14px;height:14px;flex:0 0 14px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--mut);background:transparent}
-.pips i.hit{background:var(--ac);box-shadow:none}
-.pips i.bad{background:var(--bad);box-shadow:none;border-radius:3px}
-.pips i.miss{box-shadow:inset 0 0 0 2px var(--bad);background:linear-gradient(var(--bad),var(--bad)) center/10px 2px no-repeat}
+.pips i{width:12px;height:12px;flex:0 0 12px;border-radius:50%;box-shadow:inset 0 0 0 2px #ddd6cc;background:transparent}
+.pips i.hit{background:var(--color-accent);box-shadow:none}
+.pips i.bad{background:var(--bad);box-shadow:none}
+.pips i.miss{box-shadow:inset 0 0 0 2px var(--bad);background:linear-gradient(var(--bad),var(--bad)) center/8px 2px no-repeat}
 #score.down{color:var(--bad)}
-#stage{position:relative;flex:1;width:100%;max-width:var(--w);background:var(--card);border-radius:16px;overflow:hidden;min-height:240px}
+#stage{position:relative;flex:1;width:100%;max-width:var(--w);margin-inline:auto;background:var(--color-surface);border-radius:var(--radius-lg);overflow:hidden;min-height:240px;box-shadow:var(--shadow)}
 .item{position:absolute;left:50%;transform:translateX(-50%);font-size:64px;line-height:1;z-index:0}
-.pop{position:absolute;right:12px;z-index:1;font-size:22px;font-weight:700;line-height:1.2;pointer-events:none;padding:4px 10px;border-radius:10px;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.16);animation:rise 1.1s ease forwards}
+.pop{position:absolute;right:12px;z-index:1;font-size:18px;font-weight:700;line-height:1.2;pointer-events:none;padding:6px 12px;border-radius:var(--radius-pill);background:var(--color-surface);box-shadow:var(--shadow);animation:rise .9s ease forwards}
 .pop.hit{color:var(--ac)}.pop.bad{color:var(--bad)}.pop.miss{color:var(--mut)}
 @keyframes rise{0%{opacity:1;transform:translateY(0)}40%{opacity:1;transform:translateY(-8px)}100%{opacity:0;transform:translateY(-28px)}}
 @media (prefers-reduced-motion:reduce){.pop{animation:none}}
 #overlay,#hold{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:14px;text-align:center}
 #overlay{z-index:3;background:var(--card);padding:0;overflow:hidden;justify-content:safe center;gap:0}
-#overlay .sheet{flex:0 1 auto;min-height:0;width:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:14px;padding:20px 16px 8px}
+#overlay .sheet{flex:0 1 auto;min-height:0;width:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:20px;padding:28px 20px 8px}
 #overlay #go{flex:none;margin:8px 16px 16px}
 #hold{z-index:2;background:color-mix(in srgb,var(--card) 72%,transparent)}
-#hold .panel{background:var(--card);border-radius:16px;padding:20px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.16)}
-#overlay p,#hold p{color:var(--mut);margin:0;font-size:16px;line-height:1.45;max-width:36ch}
-#big{font-size:44px;font-weight:700;line-height:1.1}
+#hold .panel{background:var(--color-surface);border-radius:var(--radius-lg);padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:var(--shadow)}
+#overlay p,#hold p{color:var(--mut);margin:0;font-size:17px;line-height:1.5;max-width:32ch}
+#big{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
 .field{display:flex;flex-direction:column;align-items:center;gap:8px}
 .lbl{font-size:14px;font-weight:650;color:var(--mut)}
-.row{display:flex;gap:16px;width:100%;max-width:var(--w)}
+.row{display:flex;gap:16px;width:100%;max-width:var(--w);margin-inline:auto}
 body:not(.playing) .arrow{visibility:hidden}
-.arrow{flex:1;border:0;border-radius:18px;background:var(--card);color:var(--fg);padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.arrow{flex:1;border:0;border-radius:var(--radius-lg);background:var(--color-surface);color:var(--fg);padding:20px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:var(--shadow)}
 .arrow .ic{font-size:36px;line-height:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
-.arrow .ic span{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:4px;border-radius:12px;background:var(--bg)}
-.arrow .ar{font-size:56px;line-height:1;color:var(--ac)}
-.arrow.ok{background:var(--ac)}.arrow.no{background:var(--bad)}
-.arrow.ok .ar,.arrow.no .ar{color:#fff}
-button.s{border:0;border-radius:12px;padding:14px 32px;min-height:48px;background:var(--ac);color:#fff;font-size:18px}
-.lv{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.lv button{border:0;border-radius:12px;padding:12px 20px;min-height:44px;background:var(--bg);color:var(--fg);font-size:16px;line-height:1.2}
-.lv button.on{background:var(--ac);color:#fff}
+.arrow .ic span{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:4px;border-radius:var(--radius-sm);background:var(--color-bg-secondary)}
+.arrow .ar{line-height:0;color:var(--color-primary);display:flex}
+.arrow .ar svg{width:44px;height:44px;display:block}
+.arrow.ok{background:#e7f3e4}.arrow.no{background:#fdecea}
+.arrow.ok .ar{color:#5f8f5c}.arrow.no .ar{color:var(--color-primary)}
+button.s{border:0;border-radius:var(--radius-pill);padding:14px 32px;min-height:52px;min-width:160px;background:var(--color-primary);color:#fff;font-size:17px;font-weight:700}
+button.s:active{background:var(--color-primary-press)}
+.lv{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:4px;border-radius:var(--radius-pill);background:var(--color-bg-secondary);width:min(100%,320px)}
+.lv button{border:0;border-radius:var(--radius-pill);padding:8px 14px;min-height:40px;background:transparent;color:var(--fg);font-size:15px;font-weight:700;line-height:1.2;flex:1 1 auto}
+.lv button.on{background:var(--color-surface);color:var(--fg);box-shadow:0 2px 8px rgba(41,41,41,.08)}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 @media (min-width:700px){:root{--w:640px}}
 body{height:100dvh;max-height:100dvh;overflow:hidden}
@@ -61,60 +100,75 @@ body{height:100dvh;max-height:100dvh;overflow:hidden}
  .arrow{padding:14px 10px;gap:10px}
  .arrow .ic{font-size:30px;gap:6px}
  .arrow .ic span{min-width:40px;min-height:40px;padding:2px}
- .arrow .ar{font-size:44px}
+ .arrow .ar svg{width:36px;height:36px}
 }
-#picker{width:100%;max-width:var(--w);flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;text-align:center;padding:12px 0 24px}
-#picker h1{font-size:40px;line-height:1.1;margin:0}
-#picker .lead{margin:0 0 8px;color:var(--mut);font-size:16px}
-.pick{width:100%;border:1px solid color-mix(in srgb,var(--fg) 14%,transparent);border-radius:16px;background:var(--card);color:var(--fg);text-align:left;padding:18px 20px;min-height:88px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;box-shadow:0 8px 22px rgba(0,0,0,.06)}
-.pick-name{font-size:20px;font-weight:700}
-.pick-desc{font-size:15px;line-height:1.4;color:var(--mut)}
-#games{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+#picker{width:100%;max-width:var(--w);margin-inline:auto;flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;text-align:left;padding:8px 4px 32px}
+#picker h1{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:0}
+.lead{margin:8px 2px 28px;color:var(--color-text-muted);font-size:17px;line-height:1.5}
+.store-list{background:var(--color-surface);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+button.pick{width:100%;border:0;border-radius:0;background:transparent;color:var(--fg);text-align:left;padding:14px 16px;min-height:88px;display:flex;flex-direction:row;align-items:center;gap:14px;box-shadow:none}
+button.pick+button.pick{box-shadow:inset 0 1px 0 var(--sep)}
+.pick-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.pick-name{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.pick-desc{font-size:15px;line-height:1.4;color:var(--color-text-muted)}
+.art{width:64px;height:64px;border-radius:var(--radius-md);flex:none;display:block;overflow:hidden;background:var(--color-bg)}
+.art img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.pill{margin-left:auto;flex:none;min-width:84px;height:40px;padding:0 18px;border-radius:var(--radius-pill);background:var(--color-primary);color:#fff;font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+#games,#mem-games{border:0;border-radius:var(--radius-pill);padding:8px 2px;min-height:44px;background:transparent;color:var(--color-text-muted);font-size:17px;font-weight:700}
+#games:hover,#mem-games:hover,#games:focus-visible,#mem-games:focus-visible{color:var(--color-primary)}
 #fall{display:contents}
 body:not(.fall) #fall,body:not(.pick) #picker,body:not(.mem) #mem{display:none}
-#mem{width:min(100%,480px);flex:1;min-height:0;max-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:8px;padding:4px 0 8px;overflow:auto;--cell:#3a3f4b;--lit:#ffc83d;--ok:#2ecc71;--bad:#e74c3c;--btn:#2f6fed}
+#mem{width:min(100%,480px);margin-inline:auto;flex:1;min-height:0;max-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;padding:4px 0 8px;overflow:auto;--cell:#f5f1ea;--lit:#f7d774;--ok:#a8c9a0;--bad:#e7a196;--btn:var(--color-primary)}
 #mem-side{display:contents}
-@media (prefers-color-scheme:dark){#mem{--cell:#2b2f38}}
-:root[data-theme="dark"] #mem{--cell:#2b2f38}
-#mem h1{font-size:22px;margin:0;order:1}
-#mem .bar{display:flex;gap:10px 16px;font-size:17px;margin:0;flex-wrap:wrap;justify-content:center;align-items:center;width:100%;order:1}
-#mem-msg{min-height:28px;font-size:22px;font-weight:700;margin:0;text-align:center;order:1}
+#mem h1{font-size:32px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:0;order:1;align-self:flex-start;width:100%}
+#mem .bar{display:flex;gap:8px 14px;font-size:15px;font-weight:600;color:var(--mut);margin:0;flex-wrap:wrap;justify-content:flex-start;align-items:center;width:100%;order:1}
+#mem-msg{min-height:28px;font-size:18px;font-weight:600;line-height:1.4;margin:0;text-align:left;align-self:flex-start;width:100%;order:1}
 #mem-board{order:2;flex:1 1 auto;min-height:0;max-height:420px;width:min(100%,420px);display:grid;place-items:center;container-type:size}
 #mem-grid{display:grid;gap:clamp(6px,2.4cqmin,12px);width:min(100cqw,100cqh,420px);height:min(100cqw,100cqh,420px)}
 #mem-grid.big{gap:clamp(4px,1.6cqmin,9px)}
-#mem .c{background:var(--cell);border:0;border-radius:clamp(8px,16%,14px);transition:background .15s;cursor:pointer}
+#mem .c{background:var(--color-surface);border:0;border-radius:clamp(12px,22%,18px);box-shadow:0 6px 16px rgba(41,41,41,.05);transition:background .2s ease,transform .18s ease;cursor:pointer}
 #mem .c.lit{background:var(--lit)}#mem .c.ok{background:var(--ok)}#mem .c.bad{background:var(--bad)}
 #mem .c:focus-visible{outline:3px solid var(--lit);outline-offset:3px}
-#mem-timer{width:48px;height:48px;border-radius:50%;background:var(--lit);color:#1b1e24;font-size:26px;font-weight:700;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);flex:none}
-#mem-trophy{display:none;font-size:72px;line-height:1;margin:0;order:3;animation:pop .6s ease-out}
-@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
-#mem-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:none;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
-#mem-overlay.show{display:flex;animation:fadein .4s ease-out}
+#mem-timer{width:48px;height:48px;border-radius:50%;background:var(--color-secondary);color:var(--color-text);font-size:22px;font-weight:700;display:none;align-items:center;justify-content:center;flex:none}
+#mem-trophy{display:none;font-size:48px;line-height:1;margin:0;order:3;animation:pop .25s ease-out}
+@keyframes pop{from{opacity:0}to{opacity:1}}
+#mem-overlay{position:fixed;inset:0;z-index:50;background:rgba(255,249,242,.94);display:none;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+#mem-overlay.show{display:flex;animation:fadein .25s ease-out}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
-#mem-bigtrophy{font-size:min(70vw,60vh,380px);line-height:1;animation:bigpop 1s ease-out,float 2s ease-in-out 1s infinite;filter:drop-shadow(0 0 40px #ffc83d)}
-@keyframes bigpop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.3) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}
-@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.05)}}
-#mem-ovtext{color:#fff;font-size:28px;font-weight:700;margin-top:16px;text-align:center}
-#mem-ovsub{color:#ddd;font-size:15px;margin-top:6px}
+#mem-bigtrophy{font-size:72px;line-height:1;animation:pop .25s ease-out}
+#mem-ovtext{color:var(--fg);font-size:32px;font-weight:700;letter-spacing:-.02em;margin-top:12px;text-align:center}
+#mem-ovsub{color:var(--mut);font-size:16px;margin-top:8px}
 #mem .conf{position:absolute;top:-40px;font-size:28px;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
 #mem-final{font-size:clamp(16px,4vw,24px);font-weight:700;margin:0;text-align:center;order:3}
 #mem-final:empty{display:none}
 #mem .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:0;order:3}
-#mem button.go{background:var(--btn);color:#fff;border:0;border-radius:12px;font-size:20px;padding:12px 30px;min-height:48px}
-#mem button.go.alt{background:var(--cell)}
-#mem-games{border:0;border-radius:10px;padding:8px 14px;min-height:44px;background:var(--card);color:var(--fg)}
+#mem button.go{background:var(--btn);color:#fff;border:0;border-radius:var(--radius-pill);font-size:17px;font-weight:700;padding:14px 32px;min-height:52px;min-width:160px}
+#mem button.go:active{background:var(--color-primary-press)}
+#mem button.go.alt{background:var(--color-bg-secondary);color:var(--color-text)}
 @media (prefers-reduced-motion:reduce){
  #mem-trophy,#mem-bigtrophy,#mem .conf,#mem-overlay{animation:none}
  #mem .c{transition:none}
 }
 body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
+@media (min-height:720px){
+ .store-list{background:transparent;overflow:visible;box-shadow:none;display:flex;flex-direction:column;gap:20px}
+ button.pick{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:16px;row-gap:4px;min-height:0;padding:16px;border-radius:24px;background:var(--color-surface);box-shadow:var(--shadow)}
+ button.pick+button.pick{box-shadow:var(--shadow)}
+ .pick-copy{display:contents}
+ .pick-name{grid-area:2 / 1 / 3 / -1;font-size:22px}
+ .pick-desc{grid-area:3 / 1 / 4 / 2;font-size:16px;line-height:1.45;max-width:34ch}
+ button.pick .art{grid-area:1 / 1 / 2 / -1;width:100%;height:200px;margin-bottom:12px;border-radius:var(--radius-md)}
+ button.pick .art img{object-position:center}
+ button.pick .pill{grid-area:3 / 2 / 4 / 3;margin:0;align-self:center}
+}
 @media (max-height:420px){
  body{padding:6px;gap:6px}
- #picker{padding:0;gap:8px}
+ #picker{padding:0}
  #picker h1{font-size:28px}
- #picker .lead{font-size:14px;margin:0}
- .pick{padding:10px 14px;min-height:0;gap:2px}
+ .lead{display:none}
+ .art{width:44px;height:44px;border-radius:12px}
+ button.pick{padding:8px 10px;min-height:0}
 }
 @media (orientation:landscape) and (max-height:560px){
  body.mem #mem{width:100%;max-width:none;display:grid;grid-template-columns:minmax(148px,34%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;gap:8px 12px;padding:0}
@@ -151,28 +205,42 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
  #bL{grid-column:1;grid-row:1/3;width:100%;justify-content:center}
  #bR{grid-column:3;grid-row:1/3;width:100%;justify-content:center}
  .arrow{padding:12px 10px;gap:8px}
- .arrow .ar{font-size:40px}
+ .arrow .ar svg{width:32px;height:32px}
  .arrow .ic{font-size:28px;gap:8px}
 }
 </style></head><body class="pick">
 <section id="picker">
-  <h1>Training</h1>
-  <p class="lead">Choose a game</p>
-  <button type="button" class="pick" id="pickFall">
-    <span class="pick-name">Falling Items</span>
-    <span class="pick-desc">Press the arrow that shows the lowest item.</span>
-  </button>
-  <button type="button" class="pick" id="pickMem">
-    <span class="pick-name">Memory</span>
-    <span class="pick-desc">Remember the lit squares, then tap them.</span>
-  </button>
+  <h1>Choose a game</h1>
+  <p class="lead">Whenever you feel like it.</p>
+  <div class="store-list">
+    <button type="button" class="pick" id="pickFall">
+      <span class="art fall" aria-hidden="true">
+        <img src="art/falling.webp" alt="">
+      </span>
+      <span class="pick-copy">
+        <span class="pick-name">Falling Items</span>
+        <span class="pick-desc">Follow the lowest one down.</span>
+      </span>
+      <span class="pill">Play</span>
+    </button>
+    <button type="button" class="pick" id="pickMem">
+      <span class="art mem" aria-hidden="true">
+        <img src="art/memory.webp" alt="">
+      </span>
+      <span class="pick-copy">
+        <span class="pick-name">Memory</span>
+        <span class="pick-desc">Watch the squares, then find them.</span>
+      </span>
+      <span class="pill">Play</span>
+    </button>
+  </div>
 </section>
 <div id="fall">
 <div class="top">
-  <span>Score: <b id="score">0</b></span>
+  <button type="button" id="games">‹ Games</button>
+  <div class="scoreblock"><span class="scorecap">Score</span><b id="score">0</b></div>
   <div class="pips" id="pips" hidden role="img" aria-label="0 of 10 answered"></div>
   <div class="hud">
-    <button type="button" id="games">Games</button>
     <span id="mode" hidden></span>
     <button type="button" id="pause" hidden aria-pressed="false">Pause</button>
   </div>
@@ -180,13 +248,13 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
 <div id="stage">
   <div id="hold" hidden>
     <div class="panel">
-      <p>Paused</p>
-      <button type="button" class="s" id="resume">Resume</button>
+      <p>Taking a pause.</p>
+      <button type="button" class="s" id="resume">Continue</button>
     </div>
   </div>
   <div id="overlay">
     <div class="sheet">
-      <div id="big">Attention Training</div>
+      <div id="big">Falling Items</div>
       <p id="help"></p>
       <div class="field"><span class="lbl" id="itemsLbl">Items</span><div class="lv" id="nsel" role="group" aria-labelledby="itemsLbl"></div></div>
       <div class="field"><span class="lbl" id="speedLbl">Speed</span><div class="lv" id="lv" role="group" aria-labelledby="speedLbl"></div></div>
@@ -195,26 +263,26 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
   </div>
 </div>
 <div class="row">
-  <button type="button" class="arrow" id="bL" aria-label="Left"><span class="ic" id="iL"></span><span class="ar" aria-hidden="true">←</span></button>
-  <button type="button" class="arrow" id="bR" aria-label="Right"><span class="ic" id="iR"></span><span class="ar" aria-hidden="true">→</span></button>
+  <button type="button" class="arrow" id="bL" aria-label="Left"><span class="ic" id="iL"></span><span class="ar" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M30 12 L16 24 L30 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+  <button type="button" class="arrow" id="bR" aria-label="Right"><span class="ic" id="iR"></span><span class="ar" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M18 12 L32 24 L18 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
 </div>
 <div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
 </div>
 <div id="mem">
   <div id="mem-side">
     <div class="bar">
-      <button type="button" id="mem-games">Games</button>
+      <button type="button" id="mem-games">‹ Games</button>
       <span id="mem-level">Level 1</span>
       <span id="mem-round">Round 0/4</span>
       <span id="mem-score">Score: 0</span>
       <div id="mem-timer"></div>
     </div>
-    <h1>Memory Training</h1>
-    <div id="mem-msg" aria-live="polite">Click Start</div>
+    <h1>Memory</h1>
+    <div id="mem-msg" aria-live="polite">Tap Start</div>
     <div id="mem-trophy" aria-hidden="true">🏆</div>
     <div id="mem-final"></div>
     <div class="btns">
-      <button type="button" class="go" id="mem-next" hidden>Next Level ▶</button>
+      <button type="button" class="go" id="mem-next" hidden>Next level</button>
       <button type="button" class="go" id="mem-start">Start</button>
     </div>
   </div>
@@ -223,8 +291,8 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
   </div>
   <div id="mem-overlay">
     <div id="mem-bigtrophy" aria-hidden="true">🏆</div>
-    <div id="mem-ovtext">Congratulations!</div>
-    <div id="mem-ovsub">Tap to continue</div>
+    <div id="mem-ovtext">You did it.</div>
+    <div id="mem-ovsub">Tap anywhere to go on.</div>
   </div>
 </div>
 <script>
@@ -239,9 +307,9 @@ const TOTAL=10;
 function say(text){$('live').textContent=text;}
 function helpText(){
   const rule=nItems===4
-    ?'Items fall from the top. Press the arrow that shows the lowest one. Each arrow shows two.'
-    :'Items fall from the top. Press the arrow that shows the lowest one.';
-  return rule+' Correct +10, wrong −10, letting one fall scores 0. 10 items per round.';
+    ?'Things drift down. Each side shows two. Choose the side with the lowest one.'
+    :'Things drift down. Choose the side with the lowest one.';
+  return rule+' Ten in a round.';
 }
 function help(){if(!roundOver)$('help').textContent=helpText();}
 function choice(label,on){
@@ -301,7 +369,7 @@ function loop(t,id){
 function popAt(it,kind){
   const el=document.createElement('div');
   el.className='pop '+kind;
-  el.textContent=kind==='hit'?'+10':kind==='bad'?'−10':'Miss';
+  el.textContent=kind==='hit'?'+10':kind==='bad'?'Wrong':'Miss';
   el.style.top=Math.max(8,it.y)+'px';
   $('stage').appendChild(el);
   setTimeout(()=>el.remove(),1100);
@@ -317,7 +385,7 @@ function remove(it,delta,kind){
   else if(delta>0&&score>=0)$('score').classList.remove('down');
   upd();
   if(done>=TOTAL)finish();
-  else say((kind==='hit'?'Correct. Plus 10. ':kind==='bad'?'Wrong. Minus 10. ':'Missed. ')+done+' of '+TOTAL+'. Score '+score+'.');
+  else say((kind==='hit'?'Correct. Plus 10. ':kind==='bad'?'Wrong. ':'Missed. ')+done+' of '+TOTAL+'. Score '+score+'.');
 }
 function flash(b,ok){
   b.classList.remove('ok','no');b.classList.add(ok?'ok':'no');
@@ -328,13 +396,13 @@ function press(side){
   const it=items[0];
   const ok=(nItems===4?Math.floor(it.type/2):it.type)===side;
   flash(side?$('bR'):$('bL'),ok);
-  remove(it,ok?10:-10,ok?'hit':'bad');
+  remove(it,ok?10:0,ok?'hit':'bad');
 }
 function setPause(on){
   if(!running)return;
   paused=on;
   $('hold').hidden=!on;
-  $('pause').textContent=on?'Resume':'Pause';
+  $('pause').textContent=on?'Continue':'Pause';
   $('pause').setAttribute('aria-pressed',on?'true':'false');
   say(on?'Paused':'Resumed');
   if(!on)last=performance.now();
@@ -343,9 +411,9 @@ function finish(){
   running=false;paused=false;roundOver=true;
   document.body.classList.remove('playing');
   $('hold').hidden=true;$('pause').hidden=true;
-  $('big').textContent=score+' pts';
-  $('help').textContent=hits+' correct, '+wrongs+' wrong, '+misses+' missed';
-  $('go').textContent='Play again';
+  $('big').textContent=score+' points';
+  $('help').textContent=hits+' right, '+wrongs+' wrong, '+misses+' missed';
+  $('go').textContent='Once more';
   $('overlay').style.display='flex';
   say('Round over. '+$('help').textContent+'. Score '+score+'.');
 }
@@ -364,7 +432,7 @@ function leaveFall(){
   document.body.classList.remove('playing');
   $('hold').hidden=true;$('pause').hidden=true;
   if($('overlay').style.display==='none'){
-    $('big').textContent='Attention Training';
+    $('big').textContent='Falling Items';
     $('go').textContent='Start';
     roundOver=false;help();
     $('overlay').style.display='flex';
@@ -376,19 +444,19 @@ function showPick(){
   stopMem();leaveFall();
   document.body.classList.remove('fall','mem','playing');
   document.body.classList.add('pick');
-  document.title='Training';
+  document.title='Choose a game';
 }
 function showFall(){
   stopMem();
   document.body.classList.remove('pick','mem');
   document.body.classList.add('fall');
-  document.title='Attention Training · Falling Items';
+  document.title='Falling Items';
 }
 function showMem(){
   leaveFall();
   document.body.classList.remove('pick','fall','playing');
   document.body.classList.add('mem');
-  document.title='Memory Training';
+  document.title='Memory';
   enterMem();
 }
 $('games').onclick=showPick;
@@ -396,7 +464,7 @@ $('pickFall').onclick=showFall;
 $('pickMem').onclick=showMem;
 nUI();lvUI();help();
 (()=>{
-const SHOW_MS=3000,NEXT_MS=2000;
+const SHOW_MS=6000,NEXT_MS=2000;
 const LEVELS=[{n:3,k:2,rounds:4},{n:4,k:4,rounds:5}];
 const total=()=>LEVELS[level].rounds;
 const grid=$('mem-grid'),msg=$('mem-msg');
@@ -436,7 +504,7 @@ function newRound(){
   const {n,k}=LEVELS[level];
   const idx=[...Array(n*n).keys()].sort(()=>Math.random()-.5);
   targets=idx.slice(0,k);
-  msg.textContent='Remember the lit squares…';
+  msg.textContent='Watch the lit squares.';
   clearTimeout(waitShow);
   waitShow=setTimeout(()=>{
     targets.forEach(i=>cells[i].classList.add('lit'));
@@ -448,7 +516,7 @@ function newRound(){
       left--;
       if(left>0){timer.textContent=left;return;}
       clearInterval(tick);timer.style.display='none';
-      reset();msg.textContent='Tap the squares that were lit';canTap=true;
+      reset();msg.textContent='Tap the ones you remember.';canTap=true;
     },1000);
   },500);
 }
@@ -456,11 +524,11 @@ function tap(i){
   if(!canTap||found.includes(i))return;
   if(targets.includes(i)){
     found.push(i);cells[i].classList.add('ok');
-    if(found.length===targets.length){canTap=false;score+=10;setInfo();msg.textContent='✅ Correct! +10';after();}
+    if(found.length===targets.length){canTap=false;score+=10;setInfo();msg.textContent='That’s it. Plus 10.';after();}
   }else{
     canTap=false;cells[i].classList.add('bad');
     targets.forEach(t=>cells[t].classList.add('ok'));
-    msg.textContent='❌ Wrong';after();
+    msg.textContent='Not that one.';after();
   }
 }
 function after(){
@@ -471,17 +539,17 @@ function after(){
 function finish(){
   reset();
   const perfect=score===total()*10,hasNext=level<LEVELS.length-1;
-  msg.textContent=perfect?'🎉 Perfect score!':'Game over';
+  msg.textContent=perfect?'You remembered them all.':'That’s the round.';
   let t='Final score: '+score+' / '+(total()*10);
-  if(perfect&&!hasNext){t+='\nAll levels complete!';$('mem-trophy').style.display='block';celebrate();}
+  if(perfect&&!hasNext){t+='\nEvery level is done.';$('mem-trophy').style.display='block';celebrate();}
   const f=$('mem-final');
   f.style.whiteSpace='pre-line';f.textContent=t;
-  startBtn.textContent='Play Again';startBtn.classList.toggle('alt',perfect&&hasNext);startBtn.hidden=false;
+  startBtn.textContent='Once more';startBtn.classList.toggle('alt',perfect&&hasNext);startBtn.hidden=false;
   nextBtn.hidden=!(perfect&&hasNext);
   clearTimeout(advTimer);
   if(perfect&&hasNext){
-    msg.textContent='🎉 Level '+(level+1)+' complete!';
-    f.textContent+='\nStarting Level '+(level+2)+' in 4 seconds…';
+    msg.textContent='Level '+(level+1)+' is done.';
+    f.textContent+='\nLevel '+(level+2)+' begins in a moment.';
     advTimer=setTimeout(goNext,4000);
   }
 }
@@ -489,16 +557,8 @@ function goNext(){clearTimeout(advTimer);level++;startBtn.hidden=true;nextBtn.hi
 function celebrate(){
   const ov=$('mem-overlay');
   ov.querySelectorAll('.conf').forEach(e=>e.remove());
-  const em=['🎉','✨','⭐','🎊'];
-  for(let i=0;i<36;i++){
-    const c=document.createElement('span');c.className='conf';c.textContent=em[i%em.length];c.setAttribute('aria-hidden','true');
-    c.style.left=Math.random()*100+'%';
-    c.style.animationDuration=(2.5+Math.random()*2.5)+'s';
-    c.style.animationDelay=(Math.random()*2)+'s';
-    ov.appendChild(c);
-  }
   ov.classList.add('show');
-  clearTimeout(ovTimer);ovTimer=setTimeout(closeOverlay,6000);
+  clearTimeout(ovTimer);ovTimer=setTimeout(closeOverlay,4000);
 }
 enterMem=function(){
   stopMem();
@@ -507,7 +567,7 @@ enterMem=function(){
   $('mem-trophy').style.display='none';
   startBtn.hidden=false;startBtn.textContent='Start';startBtn.classList.remove('alt');
   nextBtn.hidden=true;
-  msg.textContent='Click Start';
+  msg.textContent='When you’re ready.';
   buildGrid();setInfo();
 };
 $('mem-overlay').onclick=closeOverlay;
