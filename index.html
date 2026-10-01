@@ -79,14 +79,10 @@ body{height:100dvh;max-height:100dvh;overflow:hidden}
 .pick-copy{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .pick-name{font-size:17px;font-weight:600;letter-spacing:-.2px}
 .pick-desc{font-size:13px;line-height:1.35;color:var(--mut)}
-.appicon{width:60px;height:60px;border-radius:14px;flex:none;position:relative}
-.appicon.fall{background:linear-gradient(160deg,#64d2ff,#0a84ff 46%,#5e5ce6)}
-.appicon.fall::before,.appicon.fall::after{content:"";position:absolute;border-radius:50%;background:#fff}
-.appicon.fall::before{width:16px;height:16px;top:12px;left:14px}
-.appicon.fall::after{width:10px;height:10px;top:34px;left:34px;opacity:.85}
-.appicon.mem{background:linear-gradient(160deg,#ffd60a,#ff9f0a 40%,#ff375f);display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:13px}
-.appicon.mem i{border-radius:3px;background:rgba(255,255,255,.38)}
-.appicon.mem i:nth-child(1),.appicon.mem i:nth-child(4){background:#fff}
+.art{width:60px;height:60px;border-radius:14px;flex:none;display:grid;place-items:center;overflow:hidden}
+.art.fall{background:linear-gradient(160deg,#64d2ff,#0a84ff 46%,#5e5ce6)}
+.art.mem{background:linear-gradient(160deg,#ffd60a,#ff9f0a 40%,#ff375f)}
+.art svg{width:82%;height:82%;display:block}
 .pill{margin-left:auto;flex:none;min-width:72px;height:32px;padding:0 14px;border-radius:999px;background:var(--pill);color:var(--blue);font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 #games,#mem-games{border:0;border-radius:10px;padding:8px 2px;min-height:44px;background:transparent;color:var(--blue);font-size:17px;font-weight:400}
 #fall{display:contents}
@@ -129,17 +125,15 @@ body:not(.fall) #fall,body:not(.pick) #picker,body:not(.mem) #mem{display:none}
 body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
 @media (min-height:560px){
  .store-list{background:transparent;overflow:visible;display:flex;flex-direction:column;gap:14px}
- .pick{position:relative;flex-direction:column;align-items:flex-start;justify-content:flex-end;min-height:196px;padding:18px;border-radius:26px;gap:4px;overflow:hidden}
+ .pick{position:relative;flex-direction:column;align-items:flex-start;justify-content:flex-end;min-height:208px;padding:18px;border-radius:26px;gap:4px;overflow:hidden}
  .pick+.pick{box-shadow:none}
  #pickFall{background:linear-gradient(165deg,#64d2ff 0%,#0a84ff 46%,#5e5ce6 100%)}
  #pickMem{background:linear-gradient(165deg,#ffd60a 0%,#ff9f0a 42%,#ff375f 100%)}
  .pick-copy{flex:none;margin-top:auto}
  .pick-name{color:#fff;font-size:24px;font-weight:700;letter-spacing:-.4px}
  .pick-desc{color:rgba(255,255,255,.88);font-size:15px;max-width:28ch}
- .pick .appicon{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0}
- .pick::before{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.22)}
- #pickFall::before{width:120px;height:120px;top:-36px;left:-18px}
- #pickMem::before{width:54px;height:54px;top:20px;left:18px;border-radius:14px;box-shadow:20px 0 0 rgba(255,255,255,.18),0 20px 0 rgba(255,255,255,.18),20px 20px 0 rgba(255,255,255,.32)}
+ .pick .art{position:absolute;top:12px;left:16px;width:84px;height:84px;border-radius:0;background:none}
+ .pick .art svg{width:100%;height:100%}
  .pick .pill{position:absolute;top:18px;right:16px;margin:0;background:rgba(255,255,255,.94);color:#1c1c1e}
 }
 @media (max-height:420px){
@@ -147,7 +141,7 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
  #picker{padding:0}
  #picker h1{font-size:28px}
  .section{font-size:17px;margin:6px 2px}
- .appicon{width:44px;height:44px;border-radius:11px}
+ .art{width:44px;height:44px;border-radius:11px}
  .pick{padding:8px 10px;min-height:0}
 }
 @media (orientation:landscape) and (max-height:560px){
@@ -194,7 +188,15 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
   <p class="section">Library</p>
   <div class="store-list">
     <button type="button" class="pick" id="pickFall">
-      <span class="appicon fall" aria-hidden="true"></span>
+      <span class="art fall" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <circle cx="32" cy="8" r="4.5" fill="#fff" opacity=".4"/>
+          <circle cx="32" cy="22" r="5.5" fill="#fff" opacity=".72"/>
+          <circle cx="32" cy="38" r="7" fill="#fff"/>
+          <polygon points="7,54 18,46 18,62" fill="#fff"/>
+          <polygon points="57,54 46,46 46,62" fill="#fff"/>
+        </svg>
+      </span>
       <span class="pick-copy">
         <span class="pick-name">Falling Items</span>
         <span class="pick-desc">Press the arrow that shows the lowest item.</span>
@@ -202,7 +204,19 @@ body.mem{height:100dvh;max-height:100dvh;overflow:hidden}
       <span class="pill">Play</span>
     </button>
     <button type="button" class="pick" id="pickMem">
-      <span class="appicon mem" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="art mem" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <rect x="6" y="6" width="14" height="14" rx="3.5" fill="#fff"/>
+          <rect x="25" y="6" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="44" y="6" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="6" y="25" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="25" y="25" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="44" y="25" width="14" height="14" rx="3.5" fill="#fff"/>
+          <rect x="6" y="44" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="25" y="44" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+          <rect x="44" y="44" width="14" height="14" rx="3.5" fill="#fff" opacity=".32"/>
+        </svg>
+      </span>
       <span class="pick-copy">
         <span class="pick-name">Memory</span>
         <span class="pick-desc">Remember the lit squares, then tap them.</span>
