@@ -285,7 +285,7 @@ function helpText(){
   const rule=nItems===4
     ?'Items fall from the top. Press the arrow that shows the lowest one. Each arrow shows two.'
     :'Items fall from the top. Press the arrow that shows the lowest one.';
-  return rule+' Correct +10, wrong −10, letting one fall scores 0. 10 items per round.';
+  return rule+' 10 items per round.';
 }
 function help(){if(!roundOver)$('help').textContent=helpText();}
 function choice(label,on){
