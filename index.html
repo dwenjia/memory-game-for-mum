@@ -359,7 +359,7 @@ function loop(t,id){
 function popAt(it,kind){
   const el=document.createElement('div');
   el.className='pop '+kind;
-  el.textContent=kind==='hit'?'+10':kind==='bad'?'−10':'Miss';
+  el.textContent=kind==='hit'?'+10':kind==='bad'?'Wrong':'Miss';
   el.style.top=Math.max(8,it.y)+'px';
   $('stage').appendChild(el);
   setTimeout(()=>el.remove(),1100);
@@ -375,7 +375,7 @@ function remove(it,delta,kind){
   else if(delta>0&&score>=0)$('score').classList.remove('down');
   upd();
   if(done>=TOTAL)finish();
-  else say((kind==='hit'?'Correct. Plus 10. ':kind==='bad'?'Wrong. Minus 10. ':'Missed. ')+done+' of '+TOTAL+'. Score '+score+'.');
+  else say((kind==='hit'?'Correct. Plus 10. ':kind==='bad'?'Wrong. ':'Missed. ')+done+' of '+TOTAL+'. Score '+score+'.');
 }
 function flash(b,ok){
   b.classList.remove('ok','no');b.classList.add(ok?'ok':'no');
@@ -386,7 +386,7 @@ function press(side){
   const it=items[0];
   const ok=(nItems===4?Math.floor(it.type/2):it.type)===side;
   flash(side?$('bR'):$('bL'),ok);
-  remove(it,ok?10:-10,ok?'hit':'bad');
+  remove(it,ok?10:0,ok?'hit':'bad');
 }
 function setPause(on){
   if(!running)return;
